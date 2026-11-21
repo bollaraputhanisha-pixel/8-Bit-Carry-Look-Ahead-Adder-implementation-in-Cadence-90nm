@@ -213,7 +213,6 @@ $$\text{EDP} = \text{PDP} \times t_{\text{pd}}$$
 
 $$\text{EDP} = (3.515 \times 10^{-15}\,\text{J}) \times (6.066 \times 10^{-11}\,\text{s}) = 2.132 \times 10^{-25}\,\text{J}\cdot\text{s} = \mathbf{213.20\,\text{fJ}\cdot\text{ps}}$$
 
-*(Note: On the worst-case critical path carry output $C_{\text{out}}$ where $t_{\text{pd}} = 70.80\,\text{ps}$, $\text{PDP}_{\text{crit}} = \mathbf{4.10\,\text{fJ}}$ and $\text{EDP}_{\text{crit}} = \mathbf{290.43\,\text{fJ}\cdot\text{ps}}$).*
 
 ---
 

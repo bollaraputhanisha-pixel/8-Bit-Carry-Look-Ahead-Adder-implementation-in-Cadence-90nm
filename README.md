@@ -272,7 +272,7 @@ Following DRC and LVS signoff, physical parasitic extraction was performed using
 
 | Full Macro Extracted View (`av_extracted`) | Transistor-Level Detailed View ($L = 100\,\text{nm}$) |
 | :---: | :---: |
-| ![Full RCX Macro](media/layouts/8_bit_cla_rcx_extracted_full.jpg) | ![RCX Detailed Transistor](media/layouts/8_bit_cla_rcx_extracted_zoom.jpg) |
+| ![Full RCX Macro](media/layouts/8_bit_cla_rcx_extracted_full.jpg) | ![RCX Detailed Transistor](media/layouts/8_bit_cla_rcx_extracted_zoom.jpeg) |
 | *Full 8-bit CLA macro showing extracted distributed RC network, routing buses, and substrate contacts.* | *Detailed inspection showing extracted MOSFET channel length $L = 100\,\text{nm}$, $m = 1$, and lumped parasitic $R/C$ elements.* |
 
 ### Pre-Layout (Schematic) vs. Post-Layout (RCX Extracted) Comparison

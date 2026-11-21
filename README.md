@@ -46,12 +46,16 @@ This project implements an **8-Bit Carry Look-Ahead Adder (CLA)** in **Cadence V
 | Parameter | Value / Characteristic | Notes |
 | :--- | :--- | :--- |
 | **Technology Node** | 90nm CMOS (Cadence GPDK090) | 1-Poly, 9-Metal CMOS process |
-| **Nominal Supply Voltage ($V_{DD}$)** | **1.80 V** | High-drive I/O & standard transistor mode |
+| **Nominal Supply Voltage ($V_{DD}$)** | **1.80 V** | Rail-to-rail dynamic swing |
 | **Minimum Gate Length ($L_{min}$)** | $90\,\text{nm}$ ($0.09\,\mu\text{m}$) | GPDK090 standard baseline |
-| **Operating Frequency** | **100.0 MHz** | 10 ns cycle period |
-| **Cout Propagation Delay ($t_{pd}$)** | **$\approx 59.15$ ps** | Sub-100 ps transition |
-| **Cout Rise Time ($t_r$, 10%-90%)** | **$20.08$ ps** | Fast output slew |
-| **Cout Fall Time ($t_f$, 90%-10%)** | **$13.34$ ps** | Fast pull-down slew |
+| **Operating Frequency ($f$)** | **100.0 MHz** | 10 ns clock cycle period |
+| **Propagation Delay ($t_{pd}$, Mean)** | **$60.66$ ps** | Average across all 8 Sum bits and Cout |
+| **Critical Path Delay ($t_{pd}$, Max)**| **$70.80$ ps** | Carry-Out ($C_{out}$) worst-case path |
+| **High-to-Low Delay ($t_{pHL}$, Mean)** | **$47.81$ ps** | Output 50% fall from input 50% crossing |
+| **Low-to-High Delay ($t_{pLH}$, Mean)** | **$73.51$ ps** | Output 50% rise from input 50% crossing |
+| **Total Average Power ($P_{avg}$)** | **$57.94\,\mu\text{W}$ ($0.0579\,\text{mW}$)** | Dynamic + leakage at 100 MHz |
+| **Power-Delay Product (PDP, Mean)** | **$3.51\,\text{fJ}$ ($3.515 \times 10^{-15}\,\text{J}$)** | Energy dissipation per addition operation |
+| **Energy-Delay Product (EDP, Mean)**| **$213.20\,\text{fJ}\cdot\text{ps}$ ($2.132 \times 10^{-25}\,\text{J}\cdot\text{s}$)** | Figure of merit balancing speed & energy |
 | **DRC Verification Status** | **100% Clean (0 Errors)** | Assura 4.1 (6,970 rules evaluated) |
 | **Word Length** | 8-bit baseline (with 16-bit extension) | Sum vector $S[7:0]$, Carry-out $C_{out}$ |
 | **EDA Toolchain** | Cadence Virtuoso IC6.1.8 / Assura / Spectre | Industry standard custom IC suite |
@@ -179,20 +183,40 @@ Simulations were performed in **Cadence Spectre** over a 100 ns window with dyna
 An automated Python analysis tool (`simulations/verify_simulation.py`) parses the raw Spectre transient CSV dataset (`simulations/8_Bit_CLA_CSA.csv`) and validates functional correctness across every switching cycle:
 
 ```
-======================================================================
- TRANSIENT TIMING ANALYSIS (CADENCE SPECTRE 90nm GPDK)
-======================================================================
- -> Cout Rise Time (10% to 90%):       20.08 ps
- -> Cout 50% Threshold Crossing Time:  15.105 ns
- -> Cout Fall Time (90% to 10%):       13.34 ps
- -> Nominal Supply Voltage (VDD):       1.80 V
- -> Operating Frequency:               100.0 MHz (10 ns clock period)
+===========================================================================
+ 8-BIT CLA PROPAGATION DELAY BREAKDOWN (CADENCE 90nm GPDK)
+===========================================================================
+Output Signal  | tpHL (Fall) [ps]   | tpLH (Rise) [ps]   | tpd (avg) [ps]  
+---------------------------------------------------------------------------
+/S0            |      50.06 ps       |      59.15 ps       |      54.60 ps
+/S1            |      49.08 ps       |      72.18 ps       |      60.63 ps
+/S2            |      49.14 ps       |      72.60 ps       |      60.87 ps
+/S3            |      48.09 ps       |      71.66 ps       |      59.88 ps
+/S4            |      48.20 ps       |      69.97 ps       |      59.09 ps
+/S5            |      46.62 ps       |      71.68 ps       |      59.15 ps
+/S6            |      50.66 ps       |      71.03 ps       |      60.84 ps
+/S7            |      49.12 ps       |      71.05 ps       |      60.08 ps
+/Cout          |      39.36 ps       |     102.24 ps       |      70.80 ps
+---------------------------------------------------------------------------
+Adder Mean     |      47.81 ps       |      73.51 ps       |      60.66 ps
+Critical Path: 70.80 ps on output /Cout
+===========================================================================
 
-======================================================================
- 8-BIT CLA LOGIC VERIFICATION TABLE (SPECTRE SIMULATION)
-======================================================================
+===========================================================================
+ POWER, PDP & EDP METRICS (VDD = 1.80 V, f = 100.0 MHz)
+===========================================================================
+ -> Total Average Power (Pavg):         57.94 uW (0.0579 mW)
+ -> Power-Delay Product (PDP, Mean):     3.51 fJ (3.515e-15 J)
+ -> Power-Delay Product (PDP, Critical): 4.10 fJ (4.102e-15 J)
+ -> Energy-Delay Product (EDP, Mean):    213.20 fJ*ps (2.132e-25 J*s)
+ -> Energy-Delay Product (EDP, Critical):290.43 fJ*ps (2.904e-25 J*s)
+===========================================================================
+
+===========================================================================
+ FUNCTIONAL VERIFICATION TABLE (SPECTRE SIMULATION)
+===========================================================================
 Time     | Cout  | S7 S6 S5 S4 S3 S2 S1 S0   | Sum (Hex)  | Status  
-----------------------------------------------------------------------
+---------------------------------------------------------------------------
   5.0 ns | 1     | 1  0  1  1  1  1  1  0    | 0x1BE      | PASSED
  15.0 ns | 0     | 0  1  0  1  1  0  1  1    | 0x05B      | PASSED
  25.0 ns | 1     | 1  0  1  1  1  1  1  0    | 0x1BE      | PASSED
@@ -203,7 +227,7 @@ Time     | Cout  | S7 S6 S5 S4 S3 S2 S1 S0   | Sum (Hex)  | Status
  75.0 ns | 0     | 0  1  0  1  1  0  1  1    | 0x05B      | PASSED
  85.0 ns | 1     | 1  0  1  1  1  1  1  0    | 0x1BE      | PASSED
  95.0 ns | 0     | 0  1  0  1  1  0  1  1    | 0x05B      | PASSED
-======================================================================
+===========================================================================
  All simulation cycles demonstrated clean rail-to-rail voltage swings.
 ```
 

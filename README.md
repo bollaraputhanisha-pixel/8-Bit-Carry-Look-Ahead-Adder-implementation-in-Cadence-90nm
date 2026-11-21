@@ -19,6 +19,8 @@
 - [Standard Cell Library (Schematic & Layout)](#-standard-cell-library-schematic--layout)
 - [16-Bit CLA Extension](#-16-bit-cla-extension)
 - [Transient Simulation & Waveform Verification](#-transient-simulation--waveform-verification)
+  - [Timing Performance Breakdown ($t_{\text{PLH}}$, $t_{\text{PHL}}$, $t_{\text{pd}}$, $t_{\text{cd}}$)](#72-timing-performance-breakdown-t_plh-t_phl-t_pd-t_cd)
+  - [Power, PDP, and EDP Analysis](#73-power-pdp-and-edp-analysis-8-bit-cla)
 - [Physical Verification & DRC Signoff](#-physical-verification--drc-signoff)
 - [Repository Structure](#-repository-structure)
 - [Quickstart & Reproduction Guide](#-quickstart--reproduction-guide)
@@ -177,6 +179,43 @@ Simulations were performed in **Cadence Spectre** over a 100 ns window with dyna
 | ![Waveform 1](media/waveforms/out1.jpg) | ![Waveform 2](media/waveforms/out2.jpg) |
 
 ![Waveform 3 (Extended View)](media/waveforms/out3.jpg)
+
+### 7.2 Timing Performance Breakdown ($t_{\text{PLH}}$, $t_{\text{PHL}}$, $t_{\text{pd}}$, $t_{\text{cd}}$)
+
+All propagation delays were evaluated at the 50% supply threshold ($V_{\text{mid}} = 0.9\,\text{V}$ at $V_{DD} = 1.8\,\text{V}$):
+
+| Hierarchy Block | $t_{\text{PLH}}$ | $t_{\text{PHL}}$ | $t_{\text{pd}}$ (Average Delay) | $t_{\text{cd}}$ (Contamination Delay) | Critical Path Description |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **CMOS Inverter** | 32.3 ps | 12.9 ps | 22.6 ps | 12.9 ps | Gate-to-drain pull-up / pull-down ($C_L \approx 15\,\text{fF}$) |
+| **2-Input XOR Gate** | 52.1 ps | 38.5 ps | 45.3 ps | 38.5 ps | Inverter buffer + complementary transmission-gate switch |
+| **1-Bit CLA Slice** | 59.2 ps | 50.1 ps | 54.6 ps | 50.1 ps | Bit 0 slice ($P_0, G_0$ generation + local sum $S_0$) |
+| **4-Bit CLA Block** | 69.9 ps | 48.2 ps | 59.1 ps | 48.2 ps | Look-ahead carry generation stage ($C_4$ prefix logic) |
+| **8-Bit Top CLA** | **73.5 ps** | **47.8 ps** | **60.7 ps** | **39.4 ps** | Measured across all vector transitions in `8_Bit_CLA_CSA.csv` |
+
+> **Comparative Advantage:** A conventional 8-bit Ripple-Carry Adder (RCA) would incur a linear critical delay of $8 \times t_{\text{carry}} \approx 8 \times 160\,\text{ps} \approx 1.28\,\text{ns}$. The Carry Look-Ahead Adder achieves an average propagation delay of **$60.66\,\text{ps}$** ($70.80\,\text{ps}$ on critical carry path $C_{\text{out}}$), delivering a **$>94\%$ latency reduction** by computing all intermediate carries in parallel through look-ahead prefix logic.
+
+---
+
+### 7.3 Power, PDP, and EDP Analysis (8-Bit CLA)
+
+- **Average Power Dissipation ($P_{\text{avg}}$):** $57.94\,\mu\text{W}$ ($5.794 \times 10^{-5}\,\text{W}$)
+- **Average Propagation Delay ($t_{\text{pd}}$):** $60.66\,\text{ps}$ ($6.066 \times 10^{-11}\,\text{s}$)
+
+#### 1. Power-Delay Product (PDP):
+
+$$\text{PDP} = P_{\text{avg}} \times t_{\text{pd}}$$
+
+$$\text{PDP} = (5.794 \times 10^{-5}\,\text{W}) \times (6.066 \times 10^{-11}\,\text{s}) = 3.515 \times 10^{-15}\,\text{J} = \mathbf{3.52\,\text{fJ}}$$
+
+#### 2. Energy-Delay Product (EDP):
+
+$$\text{EDP} = \text{PDP} \times t_{\text{pd}}$$
+
+$$\text{EDP} = (3.515 \times 10^{-15}\,\text{J}) \times (6.066 \times 10^{-11}\,\text{s}) = 2.132 \times 10^{-25}\,\text{J}\cdot\text{s} = \mathbf{213.20\,\text{fJ}\cdot\text{ps}}$$
+
+*(Note: On the worst-case critical path carry output $C_{\text{out}}$ where $t_{\text{pd}} = 70.80\,\text{ps}$, $\text{PDP}_{\text{crit}} = \mathbf{4.10\,\text{fJ}}$ and $\text{EDP}_{\text{crit}} = \mathbf{290.43\,\text{fJ}\cdot\text{ps}}$).*
+
+---
 
 ### Automated Testbench Verification Results
 

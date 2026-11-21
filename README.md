@@ -352,7 +352,7 @@ python simulations/verify_simulation.py
 
 ## 👤 Author & Acknowledgments
 
-- **Designer:** VLSI Design Engineer
+- **Author:** Bollarapu Thanisha
 - **Tools:** Cadence Virtuoso (Schematic L, Layout XL), Spectre Simulation, Cadence Assura, ViVA
 - **Technology:** Cadence Generic Process Design Kit 90nm (`gpdk090`)
 

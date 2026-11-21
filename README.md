@@ -215,7 +215,7 @@ $$\text{PDP} = P_{\text{avg}} \times t_{\text{pd}}$$
 
 $$\text{PDP} = (5.794 \times 10^{-5}\,\text{W}) \times (6.066 \times 10^{-11}\,\text{s}) = 3.515 \times 10^{-15}\,\text{J} = \mathbf{3.52\,\text{fJ}}$$
 
-*(On Critical Path $C_{\text{out}}$: $\text{PDP}_{\text{crit}} = (5.794 \times 10^{-5}\,\text{W}) \times (7.080 \times 10^{-11}\,\text{s}) = 4.102 \times 10^{-15}\,\text{J} = \mathbf{4.10\,\text{fJ}}$)*
+
 
 #### 2. Energy-Delay Product (EDP):
 
@@ -223,7 +223,7 @@ $$\text{EDP} = \text{PDP} \times t_{\text{pd}}$$
 
 $$\text{EDP} = (3.515 \times 10^{-15}\,\text{J}) \times (6.066 \times 10^{-11}\,\text{s}) = 2.132 \times 10^{-25}\,\text{J}\cdot\text{s} = \mathbf{213.20\,\text{fJ}\cdot\text{ps}}$$
 
-*(On Critical Path $C_{\text{out}}$: $\text{EDP}_{\text{crit}} = (4.102 \times 10^{-15}\,\text{J}) \times (7.080 \times 10^{-11}\,\text{s}) = 2.904 \times 10^{-25}\,\text{J}\cdot\text{s} = \mathbf{290.43\,\text{fJ}\cdot\text{ps}}$)*
+
 
 ---
 
